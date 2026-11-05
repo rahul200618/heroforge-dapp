@@ -1,0 +1,38 @@
+# -- Secrets: NEVER commit these -----------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# -- Node / Next.js ------------------------------------------
+node_modules/
+.next/
+out/
+next-env.d.ts
+npm-debug.log*
+
+# -- Hardhat -------------------------------------------------
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+
+# -- Python --------------------------------------------------
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# -- Local data (SQLite) -------------------------------------
+backend/data/*.db
+backend/data/*.db-*
+backend/data/*.sqlite*
+
+# -- OS / editor ---------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
