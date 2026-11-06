@@ -55,14 +55,14 @@ export default function ActivityView() {
   return (
     <section>
       <div className="page-header">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1.2rem" }}>
           <div>
-            <h1 className="page-title">On-Chain Activity</h1>
+            <h1 className="page-title">On-Chain Chronicle</h1>
             <p className="page-desc">Real-time chronicle of events indexed directly from the Sepolia smart contract.</p>
           </div>
-          <span className={live ? "badge ok" : "badge bad"} style={{ fontSize: "0.85rem", padding: "0.35rem 0.85rem" }}>
+          <span className={live ? "badge ok" : "badge bad"} style={{ fontSize: "0.85rem", padding: "0.4rem 0.95rem" }}>
             <span className="pulse-dot" />
-            <span>{live ? "Live WebSocket Connected" : "Connecting..."}</span>
+            <span>{live ? "Live WebSocket Stream" : "Reconnecting..."}</span>
           </span>
         </div>
       </div>
@@ -70,11 +70,11 @@ export default function ActivityView() {
       {error && <div className="banner bad">{error}</div>}
 
       {/* Filter Tabs */}
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: "0.6rem", marginBottom: "1.4rem", flexWrap: "wrap" }}>
         {[
           { id: "ALL", label: `All Events (${events.length})` },
           { id: "CHARS", label: "Characters" },
-          { id: "ITEMS", label: "Items & Gear" },
+          { id: "ITEMS", label: "Equipment & Gear" },
           { id: "XP", label: "XP & Upgrades" },
         ].map((tab) => (
           <button
@@ -88,36 +88,48 @@ export default function ActivityView() {
         ))}
       </div>
 
-      <div className="card" style={{ padding: "0.5rem 1.25rem" }}>
+      <div className="card" style={{ padding: "0.6rem 1.4rem" }}>
         {filteredEvents.length === 0 && !error && (
-          <div style={{ padding: "2.5rem 1rem", textAlign: "center" }}>
-            <span style={{ fontSize: "2rem" }}>📜</span>
-            <p className="muted" style={{ margin: "0.5rem 0 0" }}>
-              No events found for this filter.
+          <div style={{ padding: "3rem 1rem", textAlign: "center" }}>
+            <span style={{ fontSize: "2.4rem" }}>📜</span>
+            <p className="muted" style={{ margin: "0.6rem 0 0" }}>
+              No events found matching this filter.
             </p>
           </div>
         )}
 
         {filteredEvents.map((e) => (
-          <div key={`${e.txHash}-${e.type}-${JSON.stringify(e.data)}`} className="row">
-            <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", flex: 1 }}>
+          <div
+            key={`${e.txHash}-${e.type}-${JSON.stringify(e.data)}`}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.85rem 0",
+              borderBottom: "1px solid var(--line)",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem", flex: 1, minWidth: "18rem" }}>
               <div
                 style={{
-                  width: "2.2rem",
-                  height: "2.2rem",
-                  borderRadius: "8px",
+                  width: "2.5rem",
+                  height: "2.5rem",
+                  borderRadius: "10px",
                   background: "rgba(255, 255, 255, 0.05)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "1.1rem",
+                  fontSize: "1.2rem",
                 }}
               >
                 {getEventIcon(e.type)}
               </div>
               <div>
                 <div style={{ fontWeight: 600, color: "#fff", fontSize: "0.95rem" }}>{describe(e)}</div>
-                <div className="subtle" style={{ fontSize: "0.78rem", marginTop: "0.15rem" }}>
+                <div className="subtle" style={{ fontSize: "0.78rem", marginTop: "0.2rem", fontFamily: "var(--font-mono)" }}>
                   Block #{e.block}
                 </div>
               </div>
@@ -129,10 +141,10 @@ export default function ActivityView() {
                 target="_blank"
                 rel="noreferrer"
                 className="btn-secondary btn-sm"
-                style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "0.78rem" }}
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", fontSize: "0.8rem", textDecoration: "none" }}
               >
                 <span>Etherscan</span>
-                <span style={{ opacity: 0.6 }}>↗</span>
+                <span style={{ opacity: 0.7 }}>↗</span>
               </a>
             </div>
           </div>

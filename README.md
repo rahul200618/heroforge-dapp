@@ -19,7 +19,7 @@ Deployed and verified on Sepolia: [`0xa574CbE7b3CD4e082D518141E64AF3e795dA487A`]
 - **Backend** (FastAPI + web3.py): serves contract data as JSON, indexes contract events into SQLite, pushes them to the browser over a WebSocket, and, as the custodial extension, holds the game-master key and signs `earnXP` / `mintItem` when the game server calls it.
 - **Contracts** (Hardhat): the HeroForge ERC-721 contract from the Solidity course, unchanged.
 
-Full design: [docs/TECHNICAL.md](docs/TECHNICAL.md). Plan and acceptance criteria: [docs/SCOPE.md](docs/SCOPE.md).
+Full design: [docs/TECHNICAL.md](docs/TECHNICAL.md) ([Google Docs](https://docs.google.com/document/d/1-w6f3dKs9EGIyGjrehPiOCJph8cEi3OXbbPGUumgeuY/edit?usp=sharing)). Plan and acceptance criteria: [docs/SCOPE.md](docs/SCOPE.md) ([Google Docs](https://docs.google.com/document/d/15LQRsBv9h5M02ScN9V2BRSakxwXtk6LQgjqKcAx_9AY/edit?usp=sharing)).
 
 ## Repository layout
 
@@ -122,8 +122,8 @@ TODO: replace with a walkthrough of the built app (add screenshots to `docs/scre
 
 ## Documentation
 
-- [Scope document](docs/SCOPE.md)
-- [Technical design document](docs/TECHNICAL.md)
+- **Scope document**: [Local Markdown](docs/SCOPE.md) · [Google Docs](https://docs.google.com/document/d/15LQRsBv9h5M02ScN9V2BRSakxwXtk6LQgjqKcAx_9AY/edit?usp=sharing)
+- **Technical design document**: [Local Markdown](docs/TECHNICAL.md) · [Google Docs](https://docs.google.com/document/d/1-w6f3dKs9EGIyGjrehPiOCJph8cEi3OXbbPGUumgeuY/edit?usp=sharing)
 
 ## Tech stack
 

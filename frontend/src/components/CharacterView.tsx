@@ -11,9 +11,9 @@ import type { Character, Item } from "@/lib/types";
 import { TxStatus } from "./Chrome";
 
 const STATS = [
-  { key: "strength" as const, name: "Strength", icon: "⚔️", color: "str", desc: "Increases attack damage & combat power" },
-  { key: "speed" as const, name: "Speed", icon: "⚡", color: "spd", desc: "Increases evasion, initiative & dodge rate" },
-  { key: "defence" as const, name: "Defence", icon: "🛡️", color: "def", desc: "Reduces incoming damage & fortifies armor" },
+  { key: "strength" as const, name: "Strength", icon: "⚔️", color: "str", desc: "Attack power, physical damage & weapon scaling" },
+  { key: "speed" as const, name: "Speed", icon: "⚡", color: "spd", desc: "Combat initiative, dodge rate & movement velocity" },
+  { key: "defence" as const, name: "Defence", icon: "🛡️", color: "def", desc: "Damage mitigation, armor toughness & survivability" },
 ];
 
 function getItemIcon(type: string): string {
@@ -92,9 +92,9 @@ export default function CharacterView({ id }: { id: number }) {
         <Link href="/" className="muted" style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", marginBottom: "1rem" }}>
           ← Back to Champions
         </Link>
-        <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-          <div className="pulse-dot" style={{ margin: "0 auto 1rem", width: "12px", height: "12px" }} />
-          <p className="muted">Communing with Sepolia blockchain...</p>
+        <div className="card" style={{ textAlign: "center", padding: "3.5rem" }}>
+          <div className="pulse-dot" style={{ margin: "0 auto 1.2rem", width: "14px", height: "14px" }} />
+          <p className="muted" style={{ fontSize: "1rem" }}>Communing with Sepolia blockchain...</p>
         </div>
       </section>
     );
@@ -106,6 +106,7 @@ export default function CharacterView({ id }: { id: number }) {
     (iid) => items.find((i) => i.id === iid) ?? { id: iid, itemType: "item", owner: c.owner, equippedTo: id },
   );
   const inventory = items.filter((i) => i.equippedTo === 0);
+  const level = Math.floor((c.strength + c.speed + c.defence) / 3);
 
   const act = async (send: () => Promise<import("ethers").ContractTransactionResponse>) => {
     if (await run(send)) await load();
@@ -121,8 +122,8 @@ export default function CharacterView({ id }: { id: number }) {
     <section>
       {toast && <div className="toast">{toast}</div>}
 
-      <div style={{ marginBottom: "1.25rem" }}>
-        <Link href="/" className="muted" style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", fontSize: "0.9rem" }}>
+      <div style={{ marginBottom: "1.4rem" }}>
+        <Link href="/" className="muted" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontSize: "0.95rem", fontWeight: 600 }}>
           ← Back to Champions
         </Link>
       </div>
@@ -135,22 +136,29 @@ export default function CharacterView({ id }: { id: number }) {
             <h1>
               <span>{c.name}</span>
               <span className="char-id-tag">#{c.id}</span>
+              <span className="char-level-badge" style={{ fontSize: "0.85rem", padding: "0.25rem 0.75rem" }}>
+                LVL {level}
+              </span>
             </h1>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "0.4rem" }}>
-              <span className="muted" style={{ fontSize: "0.85rem" }}>Owner:</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+              <span className="muted" style={{ fontSize: "0.88rem" }}>Owner:</span>
               <button
                 type="button"
                 className="btn-secondary btn-sm"
                 onClick={copyOwner}
-                title="Click to copy owner address"
-                style={{ fontFamily: "ui-monospace, monospace" }}
+                title="Click to copy full owner address"
+                style={{ fontFamily: "var(--font-mono)" }}
               >
                 <span>{short(c.owner)}</span>
                 <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>{copiedOwner ? "✓ Copied" : "📋"}</span>
               </button>
-              {isOwner && (
-                <span className="badge ok" style={{ fontSize: "0.72rem" }}>
+              {isOwner ? (
+                <span className="badge ok">
                   You Own This Hero
+                </span>
+              ) : (
+                <span className="badge bad">
+                  Read Only
                 </span>
               )}
             </div>
@@ -159,7 +167,7 @@ export default function CharacterView({ id }: { id: number }) {
 
         <div className="hero-xp-orb">
           <div className="hero-xp-val">✨ {c.xp}</div>
-          <div className="hero-xp-lbl">Available XP</div>
+          <div className="hero-xp-lbl">Experience Points</div>
         </div>
       </div>
 
@@ -167,15 +175,15 @@ export default function CharacterView({ id }: { id: number }) {
 
       {/* Stat Progression Dashboard */}
       <div className="card">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.4rem", flexWrap: "wrap", gap: "0.75rem" }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: "1.25rem", color: "#fff" }}>Stat Progression</h2>
-            <span className="muted" style={{ fontSize: "0.85rem" }}>
-              Spend earned XP to permanently upgrade your attributes on-chain (costs {limits.xpPerUpgrade} XP per point)
+            <h2 style={{ margin: 0, fontSize: "1.35rem", color: "#fff" }}>Stat Progression</h2>
+            <span className="muted" style={{ fontSize: "0.88rem" }}>
+              Spend earned XP to permanently upgrade your hero attributes on-chain ({limits.xpPerUpgrade} XP per point)
             </span>
           </div>
-          <span className="xp-gem" style={{ fontSize: "0.85rem", padding: "0.3rem 0.75rem" }}>
-            Cost: {limits.xpPerUpgrade} XP
+          <span className="xp-gem" style={{ fontSize: "0.88rem", padding: "0.35rem 0.85rem" }}>
+            Cost: {limits.xpPerUpgrade} XP / point
           </span>
         </div>
 
@@ -210,15 +218,16 @@ export default function CharacterView({ id }: { id: number }) {
                 </div>
 
                 <div className="stat-detail-bar-wrap">
-                  <div className="stat-track" style={{ height: "10px" }}>
+                  <div className="stat-track" style={{ height: "11px" }}>
                     <div className={`stat-fill ${s.color}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <span style={{ fontWeight: 700, minWidth: "3.5rem", fontSize: "0.95rem" }}>
-                    {val} <span className="muted" style={{ fontSize: "0.75rem" }}>/ {limits.maxStat}</span>
+                  <span style={{ fontWeight: 800, minWidth: "4rem", fontSize: "1rem", fontFamily: "var(--font-mono)" }}>
+                    {val} <span className="muted" style={{ fontSize: "0.78rem" }}>/ {limits.maxStat}</span>
                   </span>
                 </div>
 
                 <button
+                  className="btn-upgrade"
                   disabled={buttonDisabled}
                   title={statusTooltip}
                   onClick={() => act(async () => (await getContract()).spendXP(id, s.key))}
@@ -232,74 +241,159 @@ export default function CharacterView({ id }: { id: number }) {
         </div>
       </div>
 
-      {/* Equipment Armory */}
+      {/* Equipment Armory (3-Slot Layout) */}
       <div className="card">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: "1.25rem", color: "#fff" }}>Equipped Gear</h2>
-            <span className="muted" style={{ fontSize: "0.85rem" }}>
-              Active battle gear currently bound to this hero ({equipped.length} equipped)
+            <h2 style={{ margin: 0, fontSize: "1.35rem", color: "#fff" }}>Battle Armory</h2>
+            <span className="muted" style={{ fontSize: "0.88rem" }}>
+              Equipped gear bound to this champion ({equipped.length} items equipped)
             </span>
           </div>
         </div>
 
         {equipped.length > 0 && (
           <div className="banner lock">
-            <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-              <span style={{ fontSize: "1.2rem" }}>🔒</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <span style={{ fontSize: "1.35rem" }}>🔒</span>
               <div>
-                <strong>Transfer Lock Active:</strong> This character NFT cannot be transferred while equipped with gear.
-                Unequip all items before transferring to another wallet.
+                <strong>Transfer Lock Active:</strong> This character NFT is bound to its equipped gear and cannot be transferred.
+                Unequip all items before transferring to another address.
               </div>
             </div>
           </div>
         )}
 
-        {equipped.length === 0 ? (
-          <p className="muted" style={{ padding: "1rem 0", margin: 0 }}>
-            No gear equipped. Equip items from your inventory below to arm your champion.
-          </p>
-        ) : (
-          <div className="gear-grid">
-            {equipped.map((i) => (
-              <div key={i.id} className="gear-card">
-                <div className="gear-info">
-                  <div className="gear-icon">{getItemIcon(i.itemType)}</div>
-                  <div className="gear-text">
-                    <span className="gear-type">{i.itemType}</span>
-                    <span className="gear-id">Item #{i.id}</span>
+        <div className="armory-slots">
+          {/* Main Hand / Weapon Slot */}
+          {(() => {
+            const weapon = equipped.find((i) => i.itemType.toLowerCase().includes("sword") || i.itemType.toLowerCase().includes("weapon"));
+            return (
+              <div className={`armory-slot-box ${weapon ? "equipped" : ""}`}>
+                <div className="slot-header">
+                  <span>Main Hand</span>
+                  <span>{weapon ? "Equipped" : "Empty"}</span>
+                </div>
+                <div className="slot-body">
+                  <div className="slot-icon">{weapon ? getItemIcon(weapon.itemType) : "⚔️"}</div>
+                  <div style={{ flex: 1 }}>
+                    {weapon ? (
+                      <div>
+                        <div style={{ fontWeight: 700, color: "#fff" }}>{weapon.itemType}</div>
+                        <div className="subtle" style={{ fontSize: "0.78rem", fontFamily: "var(--font-mono)" }}>Item #{weapon.id}</div>
+                      </div>
+                    ) : (
+                      <div className="muted" style={{ fontSize: "0.88rem" }}>No Weapon Equipped</div>
+                    )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="btn-secondary btn-sm"
-                  disabled={!canAct}
-                  onClick={() => act(async () => (await getContract()).unequipItem(id, i.id))}
-                >
-                  Unequip
-                </button>
+                {weapon && (
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    disabled={!canAct}
+                    onClick={() => act(async () => (await getContract()).unequipItem(id, weapon.id))}
+                    style={{ alignSelf: "flex-start", marginTop: "0.4rem" }}
+                  >
+                    Unequip
+                  </button>
+                )}
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })()}
+
+          {/* Off Hand / Shield Slot */}
+          {(() => {
+            const shield = equipped.find((i) => i.itemType.toLowerCase().includes("shield"));
+            return (
+              <div className={`armory-slot-box ${shield ? "equipped" : ""}`}>
+                <div className="slot-header">
+                  <span>Off Hand</span>
+                  <span>{shield ? "Equipped" : "Empty"}</span>
+                </div>
+                <div className="slot-body">
+                  <div className="slot-icon">{shield ? getItemIcon(shield.itemType) : "🛡️"}</div>
+                  <div style={{ flex: 1 }}>
+                    {shield ? (
+                      <div>
+                        <div style={{ fontWeight: 700, color: "#fff" }}>{shield.itemType}</div>
+                        <div className="subtle" style={{ fontSize: "0.78rem", fontFamily: "var(--font-mono)" }}>Item #{shield.id}</div>
+                      </div>
+                    ) : (
+                      <div className="muted" style={{ fontSize: "0.88rem" }}>No Shield Equipped</div>
+                    )}
+                  </div>
+                </div>
+                {shield && (
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    disabled={!canAct}
+                    onClick={() => act(async () => (await getContract()).unequipItem(id, shield.id))}
+                    style={{ alignSelf: "flex-start", marginTop: "0.4rem" }}
+                  >
+                    Unequip
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Headgear / Helmet Slot */}
+          {(() => {
+            const helmet = equipped.find((i) => i.itemType.toLowerCase().includes("helmet") || i.itemType.toLowerCase().includes("helm"));
+            return (
+              <div className={`armory-slot-box ${helmet ? "equipped" : ""}`}>
+                <div className="slot-header">
+                  <span>Headgear</span>
+                  <span>{helmet ? "Equipped" : "Empty"}</span>
+                </div>
+                <div className="slot-body">
+                  <div className="slot-icon">{helmet ? getItemIcon(helmet.itemType) : "🪖"}</div>
+                  <div style={{ flex: 1 }}>
+                    {helmet ? (
+                      <div>
+                        <div style={{ fontWeight: 700, color: "#fff" }}>{helmet.itemType}</div>
+                        <div className="subtle" style={{ fontSize: "0.78rem", fontFamily: "var(--font-mono)" }}>Item #{helmet.id}</div>
+                      </div>
+                    ) : (
+                      <div className="muted" style={{ fontSize: "0.88rem" }}>No Helmet Equipped</div>
+                    )}
+                  </div>
+                </div>
+                {helmet && (
+                  <button
+                    type="button"
+                    className="btn-secondary btn-sm"
+                    disabled={!canAct}
+                    onClick={() => act(async () => (await getContract()).unequipItem(id, helmet.id))}
+                    style={{ alignSelf: "flex-start", marginTop: "0.4rem" }}
+                  >
+                    Unequip
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+        </div>
       </div>
 
       {/* Inventory Bag */}
       <div className="card">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: "1.25rem", color: "#fff" }}>Inventory Armory</h2>
-            <span className="muted" style={{ fontSize: "0.85rem" }}>
+            <h2 style={{ margin: 0, fontSize: "1.35rem", color: "#fff" }}>Inventory Sack</h2>
+            <span className="muted" style={{ fontSize: "0.88rem" }}>
               Unequipped loot items in your wallet ({inventory.length} available)
             </span>
           </div>
         </div>
 
         {inventory.length === 0 ? (
-          <div style={{ padding: "1.5rem 0", textAlign: "center" }}>
-            <span style={{ fontSize: "2rem" }}>🎒</span>
-            <p className="muted" style={{ margin: "0.5rem 0 0" }}>
-              No unequipped items in inventory. Win matches or call the game master service to loot items!
+          <div style={{ padding: "2rem 0", textAlign: "center" }}>
+            <span style={{ fontSize: "2.5rem" }}>🎒</span>
+            <p className="muted" style={{ margin: "0.6rem 0 0", fontSize: "0.95rem" }}>
+              No loot items currently in your sack. Win matches or call the game server to drop items!
             </p>
           </div>
         ) : (

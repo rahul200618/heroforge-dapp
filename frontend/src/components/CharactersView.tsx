@@ -23,15 +23,23 @@ const FANTASY_NAMES = [
   "Nightweaver",
   "Eldritch",
   "Silverhand",
+  "Ignis",
+  "Kaelen",
 ];
 
 const AVATARS = ["⚔️", "🛡️", "🏹", "🥷", "🧙‍♂️", "⚡", "🐉", "🐺"];
 
-function getArchetype(c: Character): { name: string; icon: string } {
-  if (c.strength > c.speed && c.strength > c.defence) return { name: "Warrior", icon: "⚔️" };
-  if (c.speed > c.strength && c.speed > c.defence) return { name: "Rogue", icon: "🏹" };
-  if (c.defence > c.strength && c.defence > c.speed) return { name: "Guardian", icon: "🛡️" };
-  return { name: "Adventurer", icon: "✨" };
+function getArchetype(c: Character): { name: string; icon: string; rarity: string } {
+  const total = c.strength + c.speed + c.defence;
+  let rarity = "Initiate";
+  if (total >= 40) rarity = "Legendary";
+  else if (total >= 20) rarity = "Champion";
+  else if (total >= 10) rarity = "Veteran";
+
+  if (c.strength > c.speed && c.strength > c.defence) return { name: "Warrior", icon: "⚔️", rarity };
+  if (c.speed > c.strength && c.speed > c.defence) return { name: "Rogue", icon: "🏹", rarity };
+  if (c.defence > c.strength && c.defence > c.speed) return { name: "Guardian", icon: "🛡️", rarity };
+  return { name: "Adventurer", icon: "✨", rarity };
 }
 
 export default function CharactersView() {
@@ -100,16 +108,16 @@ export default function CharactersView() {
       <div className="page-header">
         <h1 className="page-title">Hero Sanctuary</h1>
         <p className="page-desc">
-          Forge, inspect, and empower your on-chain RPG champions. Characters and equipment are ERC-721 NFTs.
+          Summon, inspect, and empower your on-chain RPG champions. Characters and equipment are ERC-721 NFTs.
         </p>
       </div>
 
       {!account ? (
-        <div className="card" style={{ textAlign: "center", padding: "3rem 1.5rem" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🏰</div>
-          <h2 style={{ margin: "0 0 0.5rem", color: "#fff" }}>Connect Your Wallet</h2>
-          <p className="muted" style={{ maxWidth: "420px", margin: "0 auto 1.5rem" }}>
-            Connect MetaMask on Sepolia to view your roster of characters, spend XP, and equip items.
+        <div className="card" style={{ textAlign: "center", padding: "3.5rem 1.5rem" }}>
+          <div style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>🏰</div>
+          <h2 style={{ margin: "0 0 0.5rem", color: "#fff", fontSize: "1.75rem" }}>Connect Your Wallet</h2>
+          <p className="muted" style={{ maxWidth: "440px", margin: "0 auto 1.8rem" }}>
+            Connect MetaMask on Sepolia testnet to summon champions, earn XP in matches, and equip on-chain gear.
           </p>
           <button onClick={connect}>
             <span>🦊</span>
@@ -118,22 +126,22 @@ export default function CharactersView() {
         </div>
       ) : (
         <>
-          {/* Minting Forge Card */}
-          <div className="card" style={{ border: "1px solid rgba(245, 158, 11, 0.3)" }}>
+          {/* Anvil Forge Station */}
+          <div className="forge-station">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: "1.25rem", color: "#fff", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <h2 style={{ margin: 0, fontSize: "1.35rem", color: "#fff", display: "flex", alignItems: "center", gap: "0.6rem" }}>
                   <span>🔥</span>
-                  <span>Forge a New Hero</span>
+                  <span>The Grand Anvil</span>
                 </h2>
-                <span className="muted" style={{ fontSize: "0.85rem" }}>
-                  Mints a new character NFT to your wallet with base stats (1 STR, 1 SPD, 1 DEF)
+                <span className="muted" style={{ fontSize: "0.88rem" }}>
+                  Forge a new champion NFT to your wallet with base stats (1 STR, 1 SPD, 1 DEF)
                 </span>
               </div>
             </div>
 
-            <div className="mint-box">
-              <div className="mint-inputs">
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+              <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
                 <input
                   value={name}
                   maxLength={32}
@@ -142,14 +150,15 @@ export default function CharactersView() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && nameOk && !busy && !wrongNetwork) void mint();
                   }}
+                  style={{ flex: 1, minWidth: "15rem" }}
                 />
-                <button type="button" className="dice-btn" onClick={randomizeName} title="Pick a random fantasy name">
+                <button type="button" className="btn-secondary" onClick={randomizeName} title="Roll a random fantasy name">
                   <span>🎲</span>
                   <span>Random</span>
                 </button>
                 <button disabled={!nameOk || busy || wrongNetwork} onClick={mint}>
                   <span>⚡</span>
-                  <span>{busy ? "Forging..." : "Mint Character"}</span>
+                  <span>{busy ? "Forging..." : "Forge Champion"}</span>
                 </button>
               </div>
 
@@ -158,17 +167,17 @@ export default function CharactersView() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.85rem",
-                    padding: "0.75rem 1rem",
+                    gap: "0.9rem",
+                    padding: "0.85rem 1.15rem",
                     background: "rgba(245, 158, 11, 0.08)",
-                    borderRadius: "10px",
-                    border: "1px dashed rgba(245, 158, 11, 0.3)",
-                    fontSize: "0.88rem",
+                    borderRadius: "12px",
+                    border: "1px dashed rgba(245, 158, 11, 0.35)",
+                    fontSize: "0.9rem",
                   }}
                 >
-                  <span style={{ fontSize: "1.4rem" }}>✨</span>
+                  <span style={{ fontSize: "1.5rem" }}>✨</span>
                   <div>
-                    Preview: Ready to forge <strong>{name.trim()}</strong> as a Novice Adventurer.
+                    Blueprint Ready: Ready to forge <strong>{name.trim()}</strong> with Base Stats (1 STR, 1 SPD, 1 DEF, 0 XP).
                   </div>
                 </div>
               )}
@@ -179,28 +188,28 @@ export default function CharactersView() {
 
           {loadError && <div className="banner bad">{loadError}</div>}
 
-          {/* Roster Grid */}
-          <div style={{ marginTop: "2rem" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
-              <h2 style={{ margin: 0, fontSize: "1.35rem", color: "#fff" }}>
-                My Champions <span className="muted">({loading ? "..." : chars.length})</span>
+          {/* Champions Grid */}
+          <div style={{ marginTop: "2.4rem" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.2rem" }}>
+              <h2 style={{ margin: 0, fontSize: "1.45rem", color: "#fff" }}>
+                My Roster <span className="muted">({loading ? "..." : chars.length})</span>
               </h2>
             </div>
 
             {loading ? (
-              <div className="card" style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                <div className="pulse-dot" style={{ margin: "0 auto 1rem", width: "12px", height: "12px" }} />
-                <h3 style={{ margin: "0 0 0.4rem", color: "#fff" }}>Summoning Champions...</h3>
-                <p className="muted" style={{ margin: 0 }}>
-                  Fetching your hero NFTs and progression stats from Sepolia.
+              <div className="card" style={{ textAlign: "center", padding: "3.5rem 1rem" }}>
+                <div className="pulse-dot" style={{ margin: "0 auto 1.2rem", width: "14px", height: "14px" }} />
+                <h3 style={{ margin: "0 0 0.5rem", color: "#fff", fontSize: "1.35rem" }}>Summoning Champions...</h3>
+                <p className="muted" style={{ margin: 0, fontSize: "0.95rem" }}>
+                  Reading hero NFTs and progression stats from Sepolia blockchain.
                 </p>
               </div>
             ) : chars.length === 0 ? (
-              <div className="card" style={{ textAlign: "center", padding: "2.5rem 1rem" }}>
-                <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🗡️</div>
-                <h3 style={{ margin: "0 0 0.4rem", color: "#fff" }}>No Characters Found</h3>
-                <p className="muted" style={{ margin: 0 }}>
-                  You have not minted any characters yet. Use the Forge above to mint your first champion!
+              <div className="card" style={{ textAlign: "center", padding: "3rem 1rem" }}>
+                <div style={{ fontSize: "3rem", marginBottom: "0.85rem" }}>🗡️</div>
+                <h3 style={{ margin: "0 0 0.5rem", color: "#fff" }}>No Champions Found</h3>
+                <p className="muted" style={{ margin: 0, fontSize: "0.95rem" }}>
+                  Your roster is empty. Use The Grand Anvil above to forge your first hero!
                 </p>
               </div>
             ) : (
@@ -212,33 +221,35 @@ export default function CharactersView() {
 
                   return (
                     <Link key={c.id} href={`/characters/${c.id}`} className="card link">
-                      <div className="char-card-header">
-                        <div className="char-title">
-                          <span style={{ fontSize: "1.4rem" }}>{avatar}</span>
-                          <span>{c.name}</span>
-                          <span className="char-id-tag">#{c.id}</span>
+                      <div className="char-card-top">
+                        <div className="char-title-wrap">
+                          <div className="char-avatar-ring">{avatar}</div>
+                          <div>
+                            <div className="char-name">{c.name}</div>
+                            <div className="char-id-tag">Hero #{c.id}</div>
+                          </div>
                         </div>
-                        <span className="char-class-badge">{archetype.name}</span>
+                        <span className="char-level-badge">LVL {level}</span>
                       </div>
 
                       {/* Stat Meters */}
                       <div className="stat-bars-mini">
                         <div className="stat-meter">
-                          <span className="stat-name">STR</span>
+                          <span className="stat-name">⚔️ STR</span>
                           <div className="stat-track">
                             <div className="stat-fill str" style={{ width: `${Math.min(100, c.strength)}%` }} />
                           </div>
                           <span className="stat-val">{c.strength}</span>
                         </div>
                         <div className="stat-meter">
-                          <span className="stat-name">SPD</span>
+                          <span className="stat-name">⚡ SPD</span>
                           <div className="stat-track">
                             <div className="stat-fill spd" style={{ width: `${Math.min(100, c.speed)}%` }} />
                           </div>
                           <span className="stat-val">{c.speed}</span>
                         </div>
                         <div className="stat-meter">
-                          <span className="stat-name">DEF</span>
+                          <span className="stat-name">🛡️ DEF</span>
                           <div className="stat-track">
                             <div className="stat-fill def" style={{ width: `${Math.min(100, c.defence)}%` }} />
                           </div>
@@ -248,9 +259,9 @@ export default function CharactersView() {
 
                       <div className="char-card-footer">
                         <span className="xp-gem">✨ {c.xp} XP</span>
-                        <span className="subtle" style={{ fontSize: "0.8rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                        <span className="subtle" style={{ fontSize: "0.82rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
                           <span>🛡️ {c.equippedItemIds.length} equipped</span>
-                          <span style={{ color: "var(--gold)", fontWeight: 700 }}>· View →</span>
+                          <span style={{ color: "var(--gold)", fontWeight: 700 }}>Inspect →</span>
                         </span>
                       </div>
                     </Link>
