@@ -9,10 +9,12 @@ Custodial      : POST /api/match/complete, POST /api/items/grant  (X-API-Key req
 Design: docs/TECHNICAL.md
 """
 import asyncio
+import concurrent.futures
 import contextlib
 import logging
 import secrets
 import sqlite3
+import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
@@ -132,15 +134,30 @@ def public_config(chain: Chain = Depends(get_chain)):
     return {"contract": chain.address, "chainId": settings.chain_id, **chain.constants()}
 
 
+_cache: dict[str, tuple[float, list]] = {}
+CACHE_TTL = 15.0  # seconds
+
+
 @app.get("/api/characters", response_model=list[CharacterOut])
 def list_characters(owner: str = Query(...), chain: Chain = Depends(get_chain),
                     conn: sqlite3.Connection = Depends(get_conn)):
     owner = parse_address(owner, "owner")
+    cache_key = f"chars_{owner.lower()}"
+    now = time.time()
+    if cache_key in _cache and (now - _cache[cache_key][0]) < CACHE_TTL:
+        return _cache[cache_key][1]
+
     rows = conn.execute(
-        "SELECT token_id FROM tokens WHERE kind='character' AND owner=? ORDER BY token_id", (owner,)
+        "SELECT token_id FROM tokens WHERE kind='character' AND LOWER(owner)=LOWER(?) ORDER BY token_id", (owner,)
     ).fetchall()
-    chars = (chain.character(r["token_id"]) for r in rows)
-    return [c for c in chars if c is not None and c["owner"] == owner]  # the chain is the truth
+    token_ids = [r["token_id"] for r in rows]
+    if not token_ids:
+        return []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(12, len(token_ids))) as ex:
+        chars = list(ex.map(chain.character, token_ids))
+    result = [c for c in chars if c is not None and c["owner"].lower() == owner.lower()]
+    _cache[cache_key] = (now, result)
+    return result
 
 
 @app.get("/api/characters/{char_id}", response_model=CharacterOut)
@@ -158,10 +175,14 @@ def list_items(owner: str = Query(...), chain: Chain = Depends(get_chain),
                conn: sqlite3.Connection = Depends(get_conn)):
     owner = parse_address(owner, "owner")
     rows = conn.execute(
-        "SELECT token_id FROM tokens WHERE kind='item' AND owner=? ORDER BY token_id", (owner,)
+        "SELECT token_id FROM tokens WHERE kind='item' AND LOWER(owner)=LOWER(?) ORDER BY token_id", (owner,)
     ).fetchall()
-    items = (chain.item(r["token_id"]) for r in rows)
-    return [i for i in items if i is not None and i["owner"] == owner]
+    token_ids = [r["token_id"] for r in rows]
+    if not token_ids:
+        return []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(12, len(token_ids))) as ex:
+        items = list(ex.map(chain.item, token_ids))
+    return [i for i in items if i is not None and i["owner"].lower() == owner.lower()]
 
 
 @app.get("/api/events", response_model=list[EventOut])

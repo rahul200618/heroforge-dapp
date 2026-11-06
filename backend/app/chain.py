@@ -82,14 +82,18 @@ class Chain:
 
     def character(self, char_id: int) -> dict | None:
         """Live character data from the chain, or None if this ID is not a character."""
-        if not self.is_character(char_id):
+        try:
+            name, xp, strength, speed, defence = self.contract.functions.getCharacter(char_id).call()
+            owner = self.owner_of(char_id)
+            if not owner:
+                return None
+            return {
+                "id": char_id, "name": name, "owner": owner, "xp": int(xp),
+                "strength": int(strength), "speed": int(speed), "defence": int(defence),
+                "equippedItemIds": self.equipped_item_ids(char_id),
+            }
+        except Exception:
             return None
-        name, xp, strength, speed, defence = self.contract.functions.getCharacter(char_id).call()
-        return {
-            "id": char_id, "name": name, "owner": self.owner_of(char_id), "xp": int(xp),
-            "strength": int(strength), "speed": int(speed), "defence": int(defence),
-            "equippedItemIds": self.equipped_item_ids(char_id),
-        }
 
     def item(self, item_id: int) -> dict | None:
         """Live item data from the chain, or None if this ID is not an item."""

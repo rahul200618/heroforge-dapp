@@ -6,8 +6,8 @@ import { WalletProvider } from "@/lib/wallet";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HeroForge",
-  description: "Own your character. Own your progress.",
+  title: "HeroForge — GameFi NFT RPG",
+  description: "Own your character. Own your progress. On-chain GameFi dApp on Sepolia.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -16,10 +16,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <WalletProvider>
           <header className="site-header">
-            <Link href="/" className="brand">HeroForge</Link>
+            <Link href="/" className="brand">
+              <span className="brand-icon">⚔️</span>
+              <span className="brand-glow">HeroForge</span>
+            </Link>
             <nav>
-              <Link href="/">Characters</Link>
-              <Link href="/activity">Activity</Link>
+              <Link href="/" className="nav-link">
+                Heroes
+              </Link>
+              <Link href="/activity" className="nav-link">
+                Activity Feed
+              </Link>
             </nav>
             <span className="spacer" />
             <ConnectButton />

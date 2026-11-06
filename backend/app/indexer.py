@@ -29,7 +29,15 @@ UPSERT_KIND = (
 def process_range(conn, chain: Chain, from_block: int, to_block: int) -> list[dict]:
     """Index logs in [from_block, to_block]. Everything, including the progress pointer,
     is written in ONE SQLite transaction. Returns only events that were new."""
-    logs = chain.w3.eth.get_logs({"address": chain.address, "fromBlock": from_block, "toBlock": to_block})
+    try:
+        logs = chain.w3.eth.get_logs({"address": chain.address, "fromBlock": from_block, "toBlock": to_block})
+    except Exception as exc:
+        msg = str(exc)
+        if "pruned history unavailable" in msg or "4444" in msg:
+            log.warning("Block range [%d, %d] pruned by RPC node. Skipping.", from_block, to_block)
+            db.set_meta(conn, "last_processed_block", str(to_block))
+            return []
+        raise
     logs = sorted(logs, key=lambda e: (e["blockNumber"], e["logIndex"]))
     new_events: list[dict] = []
     with conn:

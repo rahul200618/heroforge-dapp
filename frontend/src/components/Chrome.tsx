@@ -4,42 +4,138 @@ import { config } from "@/lib/config";
 import { useWallet } from "@/lib/wallet";
 import { short } from "@/lib/format";
 import type { TxState } from "@/lib/useTx";
+import { useState } from "react";
 
 export function ConnectButton() {
-  const { hasWallet, account, wrongNetwork, connect } = useWallet();
-  if (!hasWallet) return <span className="muted">No wallet</span>;
-  if (!account) return <button onClick={connect}>Connect wallet</button>;
+  const { account, wrongNetwork, connect } = useWallet();
+  const [copied, setCopied] = useState(false);
+
+  if (!account) {
+    return (
+      <button onClick={connect}>
+        <span>🦊</span>
+        <span>Connect Wallet</span>
+      </button>
+    );
+  }
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(account);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <span>
-      <span className={wrongNetwork ? "badge bad" : "badge ok"}>{wrongNetwork ? "Wrong network" : "Sepolia"}</span>{" "}
-      <code>{short(account)}</code>
-    </span>
+    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+      <span className={wrongNetwork ? "badge bad" : "badge ok"}>
+        <span className="pulse-dot" />
+        {wrongNetwork ? "Wrong Network" : "Sepolia"}
+      </span>
+      <button
+        type="button"
+        className="btn-secondary btn-sm"
+        onClick={copyAddress}
+        title="Click to copy full address"
+        style={{ fontFamily: "ui-monospace, monospace", letterSpacing: "0.02em" }}
+      >
+        <span>{short(account)}</span>
+        <span style={{ fontSize: "0.75rem", opacity: 0.7 }}>{copied ? "✓ Copied" : "📋"}</span>
+      </button>
+    </div>
   );
 }
 
 export function NetworkBanner() {
   const { hasWallet, wrongNetwork, switchNetwork, error } = useWallet();
-  if (!hasWallet) {
-    return <div className="banner bad">MetaMask was not found. <a href="https://metamask.io/download/" target="_blank" rel="noreferrer">Install it</a> to use HeroForge. You can still browse read-only.</div>;
-  }
-  if (wrongNetwork) {
+
+  if (error) {
     return (
       <div className="banner bad">
-        Wrong network: HeroForge runs on Sepolia. Actions are disabled. <button onClick={switchNetwork}>Switch to Sepolia</button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span>⚠️</span>
+          <span>{error}</span>
+        </div>
       </div>
     );
   }
-  return error ? <div className="banner bad">{error}</div> : null;
+
+  if (!hasWallet) {
+    return (
+      <div className="banner bad">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span>🦊</span>
+          <span>
+            MetaMask extension was not detected.{" "}
+            <a href="https://metamask.io/download/" target="_blank" rel="noreferrer" style={{ textDecoration: "underline" }}>
+              Install MetaMask
+            </a>{" "}
+            to play with your own characters and items.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  if (wrongNetwork) {
+    return (
+      <div className="banner bad">
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span>⚠️</span>
+          <span>
+            <strong>Wrong Network:</strong> HeroForge operates on Sepolia testnet.
+          </span>
+        </div>
+        <button className="btn-sm" onClick={switchNetwork}>
+          Switch to Sepolia
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export function TxStatus({ state }: { state: TxState }) {
   if (state.status === "idle") return null;
-  const cls = state.status === "confirmed" ? "ok" : state.status === "failed" || state.status === "rejected" ? "bad" : "info";
-  const label = { awaiting_signature: "Waiting for signature", pending: "Pending", confirmed: "Confirmed", failed: "Failed", rejected: "Rejected" }[state.status];
+
+  const isPending = state.status === "awaiting_signature" || state.status === "pending";
+  const isOk = state.status === "confirmed";
+  const cls = isOk ? "ok" : isPending ? "info" : "bad";
+
+  const icons = {
+    awaiting_signature: "✍️",
+    pending: "⏳",
+    confirmed: "🎉",
+    failed: "❌",
+    rejected: "🚫",
+  };
+
+  const labels = {
+    awaiting_signature: "Waiting for Signature in MetaMask",
+    pending: "Transaction Confirming on Sepolia",
+    confirmed: "Confirmed on Blockchain",
+    failed: "Transaction Failed",
+    rejected: "Transaction Rejected",
+  };
+
   return (
     <div className={`banner ${cls}`}>
-      <strong>{label}.</strong> {state.message}{" "}
-      {state.hash && <a href={`${config.etherscanBase}/tx/${state.hash}`} target="_blank" rel="noreferrer">View on Etherscan</a>}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+        <span>{icons[state.status]}</span>
+        <div>
+          <strong>{labels[state.status]}:</strong> {state.message}
+        </div>
+      </div>
+      {state.hash && (
+        <a
+          href={`${config.etherscanBase}/tx/${state.hash}`}
+          target="_blank"
+          rel="noreferrer"
+          style={{ textDecoration: "underline", fontSize: "0.85rem", whiteSpace: "nowrap" }}
+        >
+          View on Etherscan ↗
+        </a>
+      )}
     </div>
   );
 }

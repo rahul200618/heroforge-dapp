@@ -3,7 +3,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_gm",
+        "name": "_gameMaster",
         "type": "address"
       }
     ],
@@ -578,7 +578,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       },
       {
@@ -596,12 +596,12 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "i",
+        "name": "itemId",
         "type": "uint256"
       }
     ],
@@ -646,7 +646,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       }
     ],
@@ -692,7 +692,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       }
     ],
@@ -711,7 +711,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "i",
+        "name": "itemId",
         "type": "uint256"
       }
     ],
@@ -992,7 +992,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "n",
+        "name": "_newGameMaster",
         "type": "address"
       }
     ],
@@ -1005,7 +1005,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       },
       {
@@ -1084,7 +1084,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256"
       }
     ],
@@ -1110,12 +1110,12 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "c",
+        "name": "charId",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "i",
+        "name": "itemId",
         "type": "uint256"
       }
     ],
