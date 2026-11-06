@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { ConnectButton, NetworkBanner } from "@/components/Chrome";
+import { WalletProvider } from "@/lib/wallet";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,16 +14,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header className="site-header">
-          <Link href="/" className="brand">HeroForge</Link>
-          <nav>
-            <Link href="/">Characters</Link>
-            <Link href="/activity">Activity</Link>
-          </nav>
-          <span className="spacer" />
-          {/* TODO: Connect wallet button and network indicator (docs/SCOPE.md, shared header) */}
-        </header>
-        <main className="container">{children}</main>
+        <WalletProvider>
+          <header className="site-header">
+            <Link href="/" className="brand">HeroForge</Link>
+            <nav>
+              <Link href="/">Characters</Link>
+              <Link href="/activity">Activity</Link>
+            </nav>
+            <span className="spacer" />
+            <ConnectButton />
+          </header>
+          <main className="container">
+            <NetworkBanner />
+            {children}
+          </main>
+        </WalletProvider>
       </body>
     </html>
   );

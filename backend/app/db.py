@@ -68,10 +68,11 @@ def get_meta(conn: sqlite3.Connection, key: str, default: str | None = None) -> 
     return row["value"] if row else default
 
 
-def set_meta(conn: sqlite3.Connection, key: str, value: str) -> None:
+def set_meta(conn: sqlite3.Connection, key: str, value: str, commit: bool = True) -> None:
     conn.execute(
         "INSERT INTO meta (key, value) VALUES (?, ?) "
         "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
         (key, value),
     )
-    conn.commit()
+    if commit:
+        conn.commit()

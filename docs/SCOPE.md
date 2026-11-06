@@ -71,7 +71,7 @@ The app is the layer that turns the deployed contract into something a player ca
 2. A banner reads "Wrong network: HeroForge runs on Sepolia" with a **Switch to Sepolia** button. All write buttons are disabled.
 3. They click **Switch**, approve in MetaMask, and the banner disappears.
 4. They click **Mint character** and press **Reject** in MetaMask. The app shows "You rejected the transaction in MetaMask. Nothing was sent." and returns to idle.
-5. Failed transaction: with two browser tabs open on a character with exactly 10 XP, they upgrade in both. The second transaction reverts on-chain and the app shows **Failed: you don't have enough XP**, translated from the contract's `InsufficientXP` error.
+5. Failed transaction: with two browser tabs open on a character with exactly 10 XP, they upgrade in both. The contract rejects the second transaction (usually while MetaMask estimates gas, before anything is sent) and the app shows **Failed: you don't have enough XP**, translated from the contract's `InsufficientXP` error.
 
 ## 5. Screens
 
@@ -181,7 +181,7 @@ Fallback if the event index proves unreliable: add a `tokensOfOwner` view functi
 - [ ] Done when MetaMask is on a network other than Sepolia and the app shows the wrong-network banner, disables every write button, and the **Switch to Sepolia** button works
 - [ ] Done when a player with fewer than 10 XP sees all three **Upgrade** buttons disabled with a reason
 - [ ] Done when rejecting a MetaMask prompt shows "You rejected the transaction" and the UI returns to idle with no stuck Pending state
-- [ ] Done when a transaction that reverts on-chain shows **Failed** with the plain-English meaning of the contract error (tested with the two-tab XP scenario)
+- [ ] Done when a transaction the contract rejects shows **Failed** with the plain-English meaning of the contract error (tested with the two-tab XP scenario)
 - [ ] Done when minting a character shows Pending, then Confirmed, and the new character appears in "My characters" with STR 1 / SPD 1 / DEF 1 and XP 0
 - [ ] Done when equipping an item moves it to **Equipped items** and shows the transfer-lock notice, and unequipping removes the notice
 - [ ] Done when `POST /api/match/complete` with a valid key increases the XP on an open character page without a refresh

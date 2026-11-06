@@ -32,3 +32,21 @@ a:hover { text-decoration: underline; }
 
 .container { max-width: 880px; margin: 0 auto; padding: 1.5rem; }
 .muted { color: var(--muted); }
+
+button { font: inherit; padding: 0.35rem 0.8rem; border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; cursor: pointer; }
+button:disabled { background: #c9c9d3; border-color: #c9c9d3; cursor: not-allowed; }
+input { font: inherit; padding: 0.35rem 0.6rem; border: 1px solid var(--line); border-radius: 6px; min-width: 16rem; }
+code { background: #f3f3f7; padding: 0.1rem 0.3rem; border-radius: 4px; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+.card.link { display: block; color: inherit; margin: 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.row { display: flex; align-items: center; gap: 1rem; padding: 0.35rem 0; border-bottom: 1px solid #efeff4; }
+.row .label { width: 6rem; text-transform: capitalize; }
+.banner { padding: 0.6rem 0.9rem; border-radius: 6px; margin: 0.8rem 0; }
+.banner.ok { background: #d4f7e7; color: #0a6638; }
+.banner.bad { background: #fde8e8; color: #9b1a1a; }
+.banner.info { background: #e8edff; color: #1f3a8a; }
+.badge { padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; }
+.badge.ok { background: #d4f7e7; color: #0a6638; }
+.badge.bad { background: #fde8e8; color: #9b1a1a; }
+.toast { position: fixed; top: 1rem; right: 1rem; background: #0a6638; color: #fff; padding: 0.7rem 1.1rem; border-radius: 8px; font-weight: 600; }

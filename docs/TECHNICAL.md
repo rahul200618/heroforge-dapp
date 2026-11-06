@@ -4,7 +4,7 @@
 
 **Author:** Rahul
 
-**Status:** DRAFT (pre-build). Written before coding, as the brief requires. The final version must describe what was actually built, so every detail in this draft is updated or corrected before submission.
+**Status:** Backend built and verified against a local chain; frontend built. Test results in section 11 are filled in after running each case on Sepolia. Update every section so it matches what was actually built.
 
 **Related:** [SCOPE.md](SCOPE.md)
 
@@ -105,7 +105,7 @@ Example responses are illustrative and are replaced with real output once the ba
 
 | Method | Path | Purpose | Example response |
 |---|---|---|---|
-| GET | `/api/health` | Status, sync progress, whether the backend is the game master | `{"status":"ok","chainId":11155111,"lastProcessedBlock":9500123,"isGameMaster":true}` |
+| GET | `/api/health` | Status, sync progress, whether the backend is the game master | `{"status":"ok","chainId":11155111,"latestBlock":9500125,"lastProcessedBlock":9500123,"isGameMaster":true}` |
 | GET | `/api/config` | Public config for the frontend | `{"contract":"0xa574…487A","chainId":11155111,"maxStat":100,"xpPerUpgrade":10}` |
 | GET | `/api/characters?owner=0x…` | Characters owned by an address, with live stats read from the chain | `[{"id":1,"name":"Thorin","owner":"0x33a1…","xp":20,"strength":1,"speed":1,"defence":1,"equippedItemIds":[1000001]}]` |
 | GET | `/api/characters/{id}` | One character | Same object as above |
@@ -139,7 +139,7 @@ Read-only and public. It carries no secrets. Messages are JSON:
 
 - **Which events:** all of those listed in section 3.
 - **How:** polling, not subscriptions. A public RPC endpoint often limits or drops WebSocket subscriptions, while `eth_getLogs` over a block range is reliable.
-- **Loop:** every `POLL_INTERVAL_SECONDS` (default 5), read `last_processed_block`, then fetch logs from `last_processed_block + 1` up to `latest - 2`, in chunks of at most `LOG_CHUNK_BLOCKS` (default 1000) so public-RPC range limits are not hit. The two-block margin is a small guard against shallow reorgs.
+- **Loop:** every `POLL_INTERVAL_SECONDS` (default 5), read `last_processed_block`, then fetch logs from `last_processed_block + 1` up to `latest - REORG_MARGIN_BLOCKS` (default 1), in chunks of at most `LOG_CHUNK_BLOCKS` (default 1000) so public-RPC range limits are not hit. The margin is a small guard against shallow reorgs.
 - **Start block:** `START_BLOCK`, set to the contract's deployment block. It is only used on the first run or if the database is deleted.
 - **Storing:** each batch is written in a single SQLite transaction together with the new `last_processed_block`, so either everything in the range is stored and the pointer advances, or nothing changes.
 - **Idempotent:** events are keyed by `(tx_hash, log_index)`, so processing the same log twice does nothing.
@@ -308,6 +308,7 @@ A revert is usually caught at gas estimation, before MetaMask asks for a signatu
 | `ITEM_TYPES_ALLOWED` | `backend/` | No | `sword,shield,helmet` |
 | `POLL_INTERVAL_SECONDS` | `backend/` | No | `5` |
 | `LOG_CHUNK_BLOCKS` | `backend/` | No | `1000` |
+| `REORG_MARGIN_BLOCKS` | `backend/` | No | `1` |
 | `MIN_GAS_BALANCE_ETH` | `backend/` | No | `0.01` |
 | `CORS_ORIGIN` | `backend/` | No | `http://localhost:3000` |
 | `DB_PATH` | `backend/` | No | `./data/heroforge.db` |

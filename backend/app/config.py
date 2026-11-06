@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     item_types_allowed: str = "sword,shield,helmet"
     poll_interval_seconds: int = 5
     log_chunk_blocks: int = 1000
+    reorg_margin_blocks: int = 1  # stay this many blocks behind the head when indexing
     min_gas_balance_eth: float = 0.01
     cors_origin: str = "http://localhost:3000"
     db_path: str = "./data/heroforge.db"
